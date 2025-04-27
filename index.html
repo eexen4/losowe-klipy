@@ -88,13 +88,13 @@
     currentIframe.style.opacity = 1;
     nextIframe.style.opacity = 0;
 
-    preloadTimer = setTimeout(preloadNextClip, (clip.duration - 5) * 1000); // wczytaj kolejny klip 5 sekund przed końcem
+    preloadTimer = setTimeout(preloadNextClip, (clip.duration - 5) * 1000); // preload 5 sekund przed końcem
 
     clipTimer = setTimeout(() => {
       swapClips();
       currentClipIndex++;
       playNextClip();
-    }, (clip.duration + 1) * 1000); // zmiana tuż po zakończeniu
+    }, (clip.duration + 1) * 1000); // zmiana klipu po zakończeniu
   }
 
   function preloadNextClip() {
@@ -102,7 +102,7 @@
     const nextClip = clipsQueue[nextIndex];
     const nextIframe = document.getElementById("nextClip");
 
-    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
+    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=true`;
   }
 
   function swapClips() {
@@ -112,7 +112,10 @@
     currentIframe.style.opacity = 0;
     nextIframe.style.opacity = 1;
 
-    currentIframe.src = "about:blank"; // wyczyść aktualny iframe po przełączeniu
+    const currentSrc = nextIframe.src.replace("muted=true", "muted=false");
+    nextIframe.src = currentSrc;
+
+    currentIframe.src = "about:blank";
     currentIframe.id = "nextClip";
     nextIframe.id = "currentClip";
   }
