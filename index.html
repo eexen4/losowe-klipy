@@ -85,7 +85,7 @@
     clipTimer = setTimeout(() => {
       currentClipIndex++;
       playNextClip();
-    }, (clip.duration + 2) * 1000); // czas klipu + 2 sekundy buforu
+    }, clip.duration * 1000); // bez dodatkowego buforu
   }
 
   loadClips();
