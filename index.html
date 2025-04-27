@@ -39,7 +39,7 @@
 
   async function loadClips() {
     try {
-      const response = await fetch(`https://twitch-proxy-server.vercel.app/api/twitchProxy?endpoint=clips&params=broadcaster_id=${userId}&first=10`);
+      const response = await fetch(`https://twitch-proxy-server.vercel.app/api/twitchProxy?endpoint=clips&params=broadcaster_id=${userId}&first=50`);
       const data = await response.json();
 
       if (!data.data || data.data.length === 0) {
