@@ -91,7 +91,9 @@
       nextIframe.style.opacity = 0;
     }
 
-    preloadTimer = setTimeout(preloadNextClip, (clip.duration - 5) * 1000);
+    if (clip.duration > 10) {
+      preloadTimer = setTimeout(preloadNextClip, (clip.duration - 5) * 1000);
+    }
 
     clipTimer = setTimeout(() => {
       swapClips();
@@ -105,7 +107,7 @@
     const nextClip = clipsQueue[nextIndex];
     const nextIframe = document.getElementById("nextClip");
 
-    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
+    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=false&muted=true`;
   }
 
   function swapClips() {
@@ -119,7 +121,7 @@
       currentIframe.src = "about:blank";
       currentIframe.id = "nextClip";
       nextIframe.id = "currentClip";
-    }, 500);
+    }, 600);
   }
 
   loadClips();
