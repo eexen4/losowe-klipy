@@ -14,29 +14,35 @@
     #clipContainer {
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative;
     }
     iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       border: none;
+      transition: opacity 0.5s ease;
     }
   </style>
 </head>
 <body>
 
-<div id="clipContainer"></div>
+<div id="clipContainer">
+  <iframe id="currentClip" style="opacity: 1;"></iframe>
+  <iframe id="nextClip" style="opacity: 0;"></iframe>
+</div>
 
 <script>
-  const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy"; // <-- Twoja domena Vercel
-  const userId = "443343853"; // <-- Twój broadcaster ID (numer, nie login)
-  const parentDomain = "eexen4.github.io"; // <-- Twoja domena GitHub Pages (bez https://)
+  const proxyUrl = "https://twoja-nazwa.vercel.app/api/twitchProxy"; // <-- Twoja domena Vercel
+  const userId = "TWÓJ_BROADCASTER_ID"; // <-- Twój broadcaster ID (numer, nie login)
+  const parentDomain = "twoja-strona.github.io"; // <-- Twoja domena GitHub Pages (bez https://)
 
   let clipsQueue = [];
   let currentClipIndex = 0;
   let clipTimer = null;
+  let preloadTimer = null;
 
   async function loadClips() {
     try {
@@ -67,6 +73,7 @@
 
   function playNextClip() {
     if (clipTimer) clearTimeout(clipTimer);
+    if (preloadTimer) clearTimeout(preloadTimer);
 
     if (currentClipIndex >= clipsQueue.length) {
       clipsQueue = shuffleArray(clipsQueue);
@@ -74,18 +81,40 @@
     }
 
     const clip = clipsQueue[currentClipIndex];
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
-    iframe.allowFullscreen = true;
+    const currentIframe = document.getElementById("currentClip");
+    const nextIframe = document.getElementById("nextClip");
 
-    const container = document.getElementById("clipContainer");
-    container.innerHTML = '';
-    container.appendChild(iframe);
+    currentIframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
+    currentIframe.style.opacity = 1;
+    nextIframe.style.opacity = 0;
+
+    preloadTimer = setTimeout(preloadNextClip, (clip.duration - 5) * 1000); // wczytaj kolejny klip 5 sekund przed końcem
 
     clipTimer = setTimeout(() => {
+      swapClips();
       currentClipIndex++;
       playNextClip();
-    }, (clip.duration + 2) * 1000); // czas klipu + 2 sekundy buforu
+    }, (clip.duration + 1) * 1000); // zmiana tuż po zakończeniu
+  }
+
+  function preloadNextClip() {
+    const nextIndex = (currentClipIndex + 1) % clipsQueue.length;
+    const nextClip = clipsQueue[nextIndex];
+    const nextIframe = document.getElementById("nextClip");
+
+    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
+  }
+
+  function swapClips() {
+    const currentIframe = document.getElementById("currentClip");
+    const nextIframe = document.getElementById("nextClip");
+
+    currentIframe.style.opacity = 0;
+    nextIframe.style.opacity = 1;
+
+    currentIframe.src = "about:blank"; // wyczyść aktualny iframe po przełączeniu
+    currentIframe.id = "nextClip";
+    nextIframe.id = "currentClip";
   }
 
   loadClips();
