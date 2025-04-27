@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Losowe Klipy Twitch</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    iframe {
+      width: 80vw;
+      height: 45vw;
+      max-width: 1280px;
+      max-height: 720px;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="clipContainer"></div>
+
+<script>
+  const proxyUrl = "https://cllips-id.vercel.app//api/twitchProxy"; // <- zamień na swoją domenę Vercel
+  const userId = "443343853"; // <- zamień na swój broadcaster_id (numer użytkownika Twitch)
+
+  async function loadClips() {
+    try {
+      const response = await fetch(`${proxyUrl}?endpoint=clips&params=broadcaster_id=${userId}&first=5`);
+      const data = await response.json();
+
+      if (!data.data || data.data.length === 0) {
+        document.getElementById("clipContainer").innerHTML = "<p style='color:white'>Brak dostępnych klipów.</p>";
+        return;
+      }
+
+      data.data.forEach(clip => {
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=losowe-klipy.github.io&autoplay=true`; // <- zamień na swoją domenę GitHub Pages
+        iframe.allowFullscreen = true;
+        document.getElementById("clipContainer").appendChild(iframe);
+      });
+
+    } catch (error) {
+      console.error("Błąd ładowania klipów:", error);
+      document.getElementById("clipContainer").innerHTML = "<p style='color:white'>Błąd ładowania klipów.</p>";
+    }
+  }
+
+  loadClips();
+</script>
+
+</body>
+</html>
