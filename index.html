@@ -14,36 +14,29 @@
     #clipContainer {
       width: 100%;
       height: 100%;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
       border: none;
-      opacity: 0;
-      transition: opacity 1s ease;
     }
   </style>
 </head>
 <body>
 
-<div id="clipContainer">
-  <iframe id="currentClip" style="opacity: 1;"></iframe>
-  <iframe id="nextClip" style="opacity: 0;"></iframe>
-</div>
+<div id="clipContainer"></div>
 
 <script>
-  const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy"; // <-- Twoja domena Vercel
+  const proxyUrl = "https://twitch-proxy-server.app/api/twitchProxy"; // <-- Twoja domena Vercel
   const userId = "443343853"; // <-- Twój broadcaster ID (numer, nie login)
   const parentDomain = "eexen4.github.io"; // <-- Twoja domena GitHub Pages (bez https://)
 
   let clipsQueue = [];
   let currentClipIndex = 0;
   let clipTimer = null;
-  let preloadTimer = null;
 
   async function loadClips() {
     try {
@@ -74,7 +67,6 @@
 
   function playNextClip() {
     if (clipTimer) clearTimeout(clipTimer);
-    if (preloadTimer) clearTimeout(preloadTimer);
 
     if (currentClipIndex >= clipsQueue.length) {
       clipsQueue = shuffleArray(clipsQueue);
@@ -82,52 +74,18 @@
     }
 
     const clip = clipsQueue[currentClipIndex];
-    const currentIframe = document.getElementById("currentClip");
-    const nextIframe = document.getElementById("nextClip");
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
+    iframe.allowFullscreen = true;
 
-    if (currentClipIndex === 0) {
-      currentIframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
-    }
-
-    currentIframe.style.opacity = 1;
-    nextIframe.style.opacity = 0;
-
-    preloadTimer = setTimeout(preloadNextClip, (clip.duration - 5) * 1000);
+    const container = document.getElementById("clipContainer");
+    container.innerHTML = '';
+    container.appendChild(iframe);
 
     clipTimer = setTimeout(() => {
-      swapClips();
       currentClipIndex++;
       playNextClip();
-    }, (clip.duration + 1) * 1000);
-  }
-
-  function preloadNextClip() {
-    const nextIndex = (currentClipIndex + 1) % clipsQueue.length;
-    const nextClip = clipsQueue[nextIndex];
-    const nextIframe = document.getElementById("nextClip");
-
-    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=true`;
-  }
-
-  function swapClips() {
-    const currentIframe = document.getElementById("currentClip");
-    const nextIframe = document.getElementById("nextClip");
-
-    // Fade out current iframe
-    currentIframe.style.opacity = 0;
-
-    // Fade in next iframe po chwili
-    setTimeout(() => {
-      nextIframe.style.opacity = 1;
-
-      // Po pełnym przejściu zmieniamy ID bez zmiany src
-      setTimeout(() => {
-        currentIframe.src = "about:blank";
-        currentIframe.id = "nextClip";
-        nextIframe.id = "currentClip";
-      }, 1000); // czas fade transition
-
-    }, 100); // krótkie opóźnienie przed rozpoczęciem fade-in
+    }, (clip.duration + 2) * 1000); // czas klipu + 2 sekundy buforu
   }
 
   loadClips();
