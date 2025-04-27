@@ -105,7 +105,7 @@
     const nextClip = clipsQueue[nextIndex];
     const nextIframe = document.getElementById("nextClip");
 
-    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=true`;
+    nextIframe.src = `https://clips.twitch.tv/embed?clip=${nextClip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
   }
 
   function swapClips() {
@@ -116,7 +116,6 @@
     nextIframe.style.opacity = 1;
 
     setTimeout(() => {
-      nextIframe.src = nextIframe.src.replace("muted=true", "muted=false");
       currentIframe.src = "about:blank";
       currentIframe.id = "nextClip";
       nextIframe.id = "currentClip";
