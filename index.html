@@ -87,8 +87,6 @@
 
     if (currentClipIndex === 0) {
       currentIframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
-    } else {
-      currentIframe.src = currentIframe.src.replace("muted=true", "muted=false");
     }
 
     currentIframe.style.opacity = 1;
@@ -116,16 +114,16 @@
     const nextIframe = document.getElementById("nextClip");
 
     currentIframe.style.opacity = 0;
+    nextIframe.style.opacity = 1;
 
     setTimeout(() => {
       const currentSrc = nextIframe.src.replace("muted=true", "muted=false");
       nextIframe.src = currentSrc;
-      nextIframe.style.opacity = 1;
 
       currentIframe.src = "about:blank";
       currentIframe.id = "nextClip";
       nextIframe.id = "currentClip";
-    }, 500); // opóźnienie dla płynnego fade
+    }, 1000); // czas fade transition 1s
   }
 
   loadClips();
