@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Losowe Klipy Twitch</title>
+  <title>Losowe Klipy Twitch (Video)</title>
   <style>
     html, body {
       margin: 0;
@@ -18,10 +18,10 @@
       align-items: center;
       justify-content: center;
     }
-    iframe {
+    video {
       width: 100%;
       height: 100%;
-      border: none;
+      object-fit: contain;
     }
   </style>
 </head>
@@ -32,11 +32,9 @@
 <script>
   const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy";
   const userId = "443343853";
-  const parentDomain = "eexen4.github.io";
 
   let clipsQueue = [];
   let currentClipIndex = 0;
-  let clipTimer = null;
 
   async function loadClips() {
     try {
@@ -65,9 +63,11 @@
     return array;
   }
 
-  function playNextClip() {
-    if (clipTimer) clearTimeout(clipTimer);
+  function getMp4Url(thumbnailUrl) {
+    return thumbnailUrl.replace("-preview-480x272.jpg", ".mp4");
+  }
 
+  function playNextClip() {
     if (currentClipIndex >= clipsQueue.length) {
       clipsQueue = shuffleArray(clipsQueue);
       currentClipIndex = 0;
@@ -75,18 +75,23 @@
 
     const clip = clipsQueue[currentClipIndex];
     const container = document.getElementById("clipContainer");
+    const video = document.createElement('video');
 
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${parentDomain}&autoplay=true&muted=false`;
-    iframe.allowFullscreen = true;
+    const videoUrl = getMp4Url(clip.thumbnail_url);
 
-    container.innerHTML = '';
-    container.appendChild(iframe);
+    video.src = videoUrl;
+    video.autoplay = true;
+    video.controls = false;
+    video.muted = false;
+    video.playsInline = true;
 
-    clipTimer = setTimeout(() => {
+    video.onended = () => {
       currentClipIndex++;
       playNextClip();
-    }, clip.duration * 1000);
+    };
+
+    container.innerHTML = '';
+    container.appendChild(video);
   }
 
   loadClips();
