@@ -113,17 +113,21 @@
     const currentIframe = document.getElementById("currentClip");
     const nextIframe = document.getElementById("nextClip");
 
+    // Fade out current iframe
     currentIframe.style.opacity = 0;
-    nextIframe.style.opacity = 1;
 
+    // Fade in next iframe po chwili
     setTimeout(() => {
-      const currentSrc = nextIframe.src.replace("muted=true", "muted=false");
-      nextIframe.src = currentSrc;
+      nextIframe.style.opacity = 1;
 
-      currentIframe.src = "about:blank";
-      currentIframe.id = "nextClip";
-      nextIframe.id = "currentClip";
-    }, 1000); // czas fade transition 1s
+      // Po pełnym przejściu zmieniamy ID bez zmiany src
+      setTimeout(() => {
+        currentIframe.src = "about:blank";
+        currentIframe.id = "nextClip";
+        nextIframe.id = "currentClip";
+      }, 1000); // czas fade transition
+
+    }, 100); // krótkie opóźnienie przed rozpoczęciem fade-in
   }
 
   loadClips();
