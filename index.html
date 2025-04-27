@@ -36,9 +36,9 @@
 </div>
 
 <script>
-  const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy"; // <-- Twoja domena Vercel
-  const userId = "443343853"; // <-- Twój broadcaster ID (numer, nie login)
-  const parentDomain = "eexen4.github.io"; // <-- Twoja domena GitHub Pages (bez https://)
+  const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy";
+  const userId = "443343853";
+  const parentDomain = "eexen4.github.io";
 
   let clipsQueue = [];
   let currentClipIndex = 0;
@@ -121,6 +121,9 @@
       currentIframe.src = "about:blank";
       currentIframe.id = "nextClip";
       nextIframe.id = "currentClip";
+
+      // Wyslij polecenie play do nowego iframe
+      nextIframe.contentWindow.postMessage({ event: "command", func: "play", args: [] }, "*");
     }, 600);
   }
 
