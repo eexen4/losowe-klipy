@@ -8,30 +8,38 @@
       margin: 0;
       background-color: black;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
     }
     iframe {
       width: 80vw;
       height: 45vw;
       max-width: 1280px;
       max-height: 720px;
+      margin-bottom: 20px;
       border: none;
+    }
+    h1 {
+      color: white;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
+<h1>Klipy z Twitcha</h1>
 <div id="clipContainer"></div>
 
 <script>
-  const proxyUrl = "https://cllips-id.vercel.app//api/twitchProxy"; // <- zamień na swoją domenę Vercel
-  const userId = "443343853"; // <- zamień na swój broadcaster_id (numer użytkownika Twitch)
+  const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy"; // <-- zmień na swoją domenę Vercel
+  const userId = "443343853"; // <-- zmień na swój broadcaster_id (numer, nie login)
 
   async function loadClips() {
     try {
-      const response = await fetch(`${proxyUrl}?endpoint=clips&params=broadcaster_id=${userId}&first=5`);
+      const response = await fetch(`${proxyUrl}?endpoint=clips&params=broadcaster_id=${userId}&first=10`);
       const data = await response.json();
 
       if (!data.data || data.data.length === 0) {
@@ -40,13 +48,8 @@
       }
 
       data.data.forEach(clip => {
-  console.log(`<iframe src="https://clips.twitch.tv/embed?clip=${clip.id}&parent=twoja-strona.github.io" allowfullscreen></iframe>`);
-});
-
-
-      data.data.forEach(clip => {
-        const iframe = document.createElement("iframe");
-        iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=losowe-klipy.github.io&autoplay=true`; // <- zamień na swoją domenę GitHub Pages
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=eexen4.github.io`; // <-- zmień na swoją domenę GitHub Pages
         iframe.allowFullscreen = true;
         document.getElementById("clipContainer").appendChild(iframe);
       });
