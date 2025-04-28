@@ -44,7 +44,10 @@
 </div>
 
 <script>
-  const proxyUrl = "https://twitch-proxy-server.vercel.app/api/twitchProxy";
+  const proxyUrl = window.location.hostname.includes("eexen4.github.io") 
+    ? "https://twitch-proxy-server.vercel.app/api/twitchProxy"
+    : ""; // pusty lub inny URL w zależności od domeny
+
   const userId = "443343853";
   const parentDomain = "eexen4.github.io";
 
@@ -60,6 +63,11 @@
 
   async function loadClips() {
     try {
+      if (!proxyUrl) {
+        document.getElementById("clipContainer").innerHTML = "<p style='color:white'>Brak dostępu do proxy.</p>";
+        return;
+      }
+
       const savedQueue = localStorage.getItem('clipsQueue');
       const savedIndex = localStorage.getItem('currentClipIndex');
 
