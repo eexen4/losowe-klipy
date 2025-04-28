@@ -49,11 +49,10 @@
   const parentDomain = "eexen4.github.io";
 
   const excludedClips = [
-    "EnergeticEnthusiasticHumanM4xHeh-UE1zFqfUfTiShgft", "ConsiderateIncredulousVelociraptorCopyThis-zezl8vDsYyFTkSMY", "FlaccidBigAntKevinTurtle-bRAmV6Y00SywIArD"
-    // Wklej tutaj ID klipów, które chcesz wykluczyć, np. "FunnyClipID123"
+    "EnergeticEnthusiasticHumanM4xHeh-UE1zFqfUfTiShgft"
   ];
 
-  const maxClipAgeDays = 1095; // Maksymalna liczba dni od teraz (UWAGA: poprawione bez ukrytej spacji)
+  const maxClipAgeDays = 1095;
 
   let clipsQueue = [];
   let currentClipIndex = 0;
@@ -61,6 +60,16 @@
 
   async function loadClips() {
     try {
+      const savedQueue = localStorage.getItem('clipsQueue');
+      const savedIndex = localStorage.getItem('currentClipIndex');
+
+      if (savedQueue && savedIndex !== null) {
+        clipsQueue = JSON.parse(savedQueue);
+        currentClipIndex = parseInt(savedIndex, 10);
+        playNextClip();
+        return;
+      }
+
       const response = await fetch(`${proxyUrl}?endpoint=clips&params=broadcaster_id=${userId}&first=100`);
       const data = await response.json();
 
@@ -77,12 +86,19 @@
           return !clip.is_age_restricted && !excludedClips.includes(clip.id) && ageInDays <= maxClipAgeDays;
         })
       );
+      currentClipIndex = 0;
+      saveState();
       playNextClip();
 
     } catch (error) {
       console.error("Błąd ładowania klipów:", error);
       document.getElementById("clipContainer").innerHTML = "<p style='color:white'>Błąd ładowania klipów.</p>";
     }
+  }
+
+  function saveState() {
+    localStorage.setItem('clipsQueue', JSON.stringify(clipsQueue));
+    localStorage.setItem('currentClipIndex', currentClipIndex);
   }
 
   function shuffleArray(array) {
@@ -114,10 +130,12 @@
 
     authorDisplay.textContent = `Twórca: ${clip.creator_name}`;
 
+    saveState();
+
     clipTimer = setTimeout(() => {
       currentClipIndex++;
       playNextClip();
-    }, (clip.duration + 2) * 1000); // Dodane +2 sekundy buforu
+    }, (clip.duration + 2) * 1000);
   }
 
   loadClips();
